@@ -16,6 +16,13 @@ class AssessmentView(viewsets.ModelViewSet):
         resp = assessment_controller.list_assessments(request.GET, request.user)
         return resp, 200
 
+class AssessmentHomeView(viewsets.ModelViewSet):
+    @handleResponse
+    @checkAuthenticationOrError
+    def get_home(self, request):
+        resp = assessment_controller.get_home(request.GET, request.user)
+        return resp, 200
+
 class PerformanceView(viewsets.ModelViewSet):
     @handleResponse
     @checkAuthenticationOrError

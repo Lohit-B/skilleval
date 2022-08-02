@@ -67,10 +67,14 @@ def save_performance(data, user):
 
 
     ps = QuestionPerformance.objects.bulk_create(performances)
+    report = _get_report(ps)
+    a_performance.report = report
+    a_performance.save()
 
-    return 
+    resp = BasicAssessmentPerformanceSerializer(a_performance).data
+    return prepare_response(resp)
 
-def _prepare_report(performances):
+def _get_report(performances):
     weightage = 0
     total_score = 0
     strengths = []
@@ -113,12 +117,29 @@ def find_performance(filters, user):
     except AssessmentPerformance.DoesNotExist as ne:
         raise NotFound()
 
-    resp = None
-    if not a_performance.report:
-        performances = QuestionPerformance.objects.filter(user=user, assessment_performance=a_performance, is_deleted=False)
-        report = _prepare_report(performances)
-        a_performance.report = report
-        a_performance.save()
-
     resp = BasicAssessmentPerformanceSerializer(a_performance).data
+    return prepare_response(resp)
+
+def get_home(filters, user):
+    skill = filters.get('skill')
+    resp = {}
+
+    #should use a group by query. may be in next iteration
+    try:
+        easy_performance = AssessmentPerformance.objects.filter(user=user, is_deleted=False, assessment__category=skill, assessment__level='E').latest('created_on')
+        resp['E'] = BasicAssessmentPerformanceSerializer(easy_performance).data 
+    except AssessmentPerformance.DoesNotExist as ne:
+        pass
+
+    try:
+        easy_performance = AssessmentPerformance.objects.filter(user=user, is_deleted=False, assessment__category=skill, assessment__level='I').latest('created_on')
+        resp['I'] = BasicAssessmentPerformanceSerializer(hard_performance).data 
+    except AssessmentPerformance.DoesNotExist as ne:
+        pass
+    try:
+        easy_performance = AssessmentPerformance.objects.filter(user=user, is_deleted=False, assessment__category=skill, assessment__level='H').latest('created_on')
+        resp['H'] = BasicAssessmentPerformanceSerializer(hard_performance).data 
+    except AssessmentPerformance.DoesNotExist as ne:
+        pass
+
     return prepare_response(resp)

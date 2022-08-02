@@ -15,7 +15,7 @@ students = StudentView.as_view(
 )
 
 urlpatterns = [
-    path('users/login', signin),
+    path('users/signin', signin),
     path('students', students),
 ]
 
