@@ -2,6 +2,7 @@ from apis.views.assessment import AssessmentView as AssessmentAPI, AssessmentHom
 from web.helpers.common import set_auth_header, handle_response, parse_api_response, next_page_url 
 from django.template.response import TemplateResponse
 from django.shortcuts import redirect
+import json
 
 class AssessmentWebView():
     @handle_response
@@ -21,15 +22,16 @@ class AssessmentWebView():
         a_api = AssessmentAPI()
         resp = a_api.get(request, pk)
         data = parse_api_response(resp)
-        return TemplateResponse(request, "assessment.html", data)
+        data = json.loads(json.dumps(data))
+        return TemplateResponse(request, "assessment.html", dict(data))
 
     @handle_response
     @set_auth_header 
     def home(request):
-        if not request.GET.get('skill'):
+        if not request.GET.get('category'):
             return TemplateResponse(request, "assessment_home.html", {})
 
         a_api = AssessmentHomeAPI()
         resp = a_api.get_home(request)
         data = parse_api_response(resp)
-        return TemplateResponse(request, "skill_home.html", data)
+        return TemplateResponse(request, "category_home.html", data)

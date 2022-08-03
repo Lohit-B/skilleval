@@ -26,7 +26,7 @@ form.addEventListener('submit', async (event) => {
         hideLoadingScreen()
     } else {
         saveJWT(await response.json());
-        window.location = '/assessments/home'
+        window.location = '/'
     }
 });
 

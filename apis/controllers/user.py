@@ -6,6 +6,9 @@ import string
 import random
 N = 7
 
+def get_profile(user):
+    return prepare_response(UserSerializer(user).data)
+
 def get_user_by_id(user_id):
     return User.objects.filter(id=user_id, is_deleted=False).first()
 
@@ -35,7 +38,7 @@ def create_bulk_students(data, user):
     grade_id = data['grade']
     grade = Grade.objects.get(id=grade_id)
 
-    count  = data.get('count', 1)
+    count  = int(data.get('count', 1))
     total_accounts = []
     for i in range(count):
         total_accounts.append(User(
@@ -66,23 +69,3 @@ def update_student(data, user):
     to_update.save()
     return prepare_response(UserSerializer(to_update).data)
 
-def list_students(filters, user):
-    page = filters.get('page', 1)
-    size = filters.get('size', 10)
-    limit = int(size)
-    offset = (int(page)-1)*limit
-
-    users = User.objects.filter(is_deleted=False, parent=user, is_student=True)
-    grade_id = filters.get('grade')
-    if grade_id:
-        users = users.filter(grade__id=grade_id)
-
-    users = users.order_by('-created_on')[offset:offset+limit]
-
-    resp = {}
-    resp['students'] = UserSerializer(users, many=True).data
-
-    grades = Grade.objects.filter(is_deleted=False)
-    resp['grades'] = GradeSerializer(grades, many=True).data
-
-    return prepare_response(resp)

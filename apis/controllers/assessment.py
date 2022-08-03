@@ -5,6 +5,7 @@ from apis.helpers.utility import prepare_response
 from apis.helpers.exceptions import BadRequest, Forbidden, NotFound
 from django.db import transaction
 from django.db import models
+from apis.models.assessment import ASSESSMENT_CATEGORY
 
 def list_assessments(filters, user):
     page = filters.get('page', 1)
@@ -14,8 +15,12 @@ def list_assessments(filters, user):
 
     level = filters.get('level')
     category = filters.get('category')
+    relevant = filters.get('relevant')
 
     assessments = Assessment.objects.filter(is_deleted=False)
+
+    if relevant:
+        assessments = assessments.fitler(grade=user.grade)
     if level:
         assessments = assessments.filter(level=level)
 
@@ -120,26 +125,38 @@ def find_performance(filters, user):
     resp = BasicAssessmentPerformanceSerializer(a_performance).data
     return prepare_response(resp)
 
-def get_home(filters, user):
-    skill = filters.get('skill')
+def get_reports_for_category(category, user):
     resp = {}
-
-    #should use a group by query. may be in next iteration
     try:
-        easy_performance = AssessmentPerformance.objects.filter(user=user, is_deleted=False, assessment__category=skill, assessment__level='E').latest('created_on')
+        easy_performance = AssessmentPerformance.objects.filter(user=user, is_deleted=False, assessment__category=category, assessment__level='E').latest('created_on')
         resp['E'] = BasicAssessmentPerformanceSerializer(easy_performance).data 
     except AssessmentPerformance.DoesNotExist as ne:
         pass
 
     try:
-        easy_performance = AssessmentPerformance.objects.filter(user=user, is_deleted=False, assessment__category=skill, assessment__level='I').latest('created_on')
+        easy_performance = AssessmentPerformance.objects.filter(user=user, is_deleted=False, assessment__category=category, assessment__level='I').latest('created_on')
         resp['I'] = BasicAssessmentPerformanceSerializer(hard_performance).data 
     except AssessmentPerformance.DoesNotExist as ne:
         pass
     try:
-        easy_performance = AssessmentPerformance.objects.filter(user=user, is_deleted=False, assessment__category=skill, assessment__level='H').latest('created_on')
+        easy_performance = AssessmentPerformance.objects.filter(user=user, is_deleted=False, assessment__category=category, assessment__level='H').latest('created_on')
         resp['H'] = BasicAssessmentPerformanceSerializer(hard_performance).data 
     except AssessmentPerformance.DoesNotExist as ne:
         pass
 
+    return resp
+
+def get_home(filters, user):
+    category = filters.get('category')
+    resp = {'reports':{}}
+    for tpl in ASSESSMENT_CATEGORY:
+        if category == tpl[0]:
+            resp['category'] = tpl[1]
+            resp['category_code'] = tpl[0]
+            break
+
+    #should use a group by query. may be in next iteration
+
+    resp['reports'] = get_reports_for_category(category, user)
+    print(resp)
     return prepare_response(resp)

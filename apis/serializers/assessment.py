@@ -1,12 +1,20 @@
 from rest_framework import serializers
 from apis.serializers.user import UserSerializer, GradeSerializer
 from apis.models import Assessment, QuestionPerformance, Question, AssessmentPerformance
+from apis.models.assessment import ASSESSMENT_CATEGORY
 
 class AssessmentSerializer(serializers.ModelSerializer):
     grade = GradeSerializer()
+    category_title = serializers.SerializerMethodField()
+
+    def get_category_title(self, assessment):
+        for tpl in ASSESSMENT_CATEGORY:
+            if tpl[0] == assessment.category:
+                return tpl[1]
+
     class Meta:
         model= Assessment
-        fields=["id", 'level', "category", 'grade', 'weightage']
+        fields=["id", 'level', "category_title", "category", 'grade', 'weightage']
 
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:

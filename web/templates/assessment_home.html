@@ -1,3 +1,35 @@
-
 {% extends 'base.html' %}
-{{data}}
+
+{% block css %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/list_student.css' %}">
+{% endblock %}
+{% block body %}
+    <div class='mt-5'>
+        <div class='row g-2 mb-4'>
+            <div class='col-sm-4 border border-1 bg-light'>
+                <div class='p-3'>
+                    <a class='p-3 text-decoration-none' href='/assessments/home?category=SK'>Assess Skills</a>
+                </div>
+            </div>
+            <div class='col-sm-4 border border-1 bg-light'>
+                <div class='p-3'>
+                    <a class='p-3 text-decoration-none' href='/assessments/home?category=AP'>Assess Aptitude</a>
+                </div>
+            </div>
+            <div class='col-sm-4 border border-1 bg-light'>
+                <div class='p-3'>
+                    <a class='p-3 text-decoration-none' href='/assessments/home?category=PR'>Assess Personality</a>
+                </div>
+            </div>
+        </div>
+        <div class='mb-3 ms-auto me-auto text-center'>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/JC82Il2cjqA?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    {% load static %}
+    <script type='text/javascript' src="{% static 'js/list_student.js' %}"></script>
+
+{% endblock %}

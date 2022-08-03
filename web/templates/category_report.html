@@ -1,0 +1,24 @@
+<div>
+    <span>Score: </span>
+    <span>{{r_card.report.score}}</span>
+    <span>/</span>
+    <span>{{r_card.report.weightage}}</span>
+</div>
+<div>
+    <span>Strength: </span>
+    {% for s in r_card.report.strengths %}
+    <span>{{s}}</span>
+    {% if not forloop.last %}
+        <span>, </span>
+    {% endif %}
+    {% endfor %}
+</div>
+<div>
+    <span>Weakness: </span>
+    {% for s in r_card.report.weaknesses %}
+    <span>{{s}}</span>
+    {% if not forloop.last %}
+        <span>, </span>
+    {% endif %}
+    {% endfor %}
+</div>
